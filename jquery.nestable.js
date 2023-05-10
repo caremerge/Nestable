@@ -134,6 +134,29 @@
             list.w.on('mousemove', onMoveEvent);
             list.w.on('mouseup', onEndEvent);
 
+            var destroyNestable = function() {
+                list.el.find("button[data-action]").remove();
+
+                if (hasTouch) {
+                    list.el[0].removeEventListener('touchstart', onStartEvent, false);
+                    window.removeEventListener('touchmove', onMoveEvent, false);
+                    window.removeEventListener('touchend', onEndEvent, false);
+                    window.removeEventListener('touchcancel', onEndEvent, false);
+                }
+
+                list.el.off('mousedown', onStartEvent);
+                list.w.off('mousemove', onMoveEvent);
+                list.w.off('mouseup', onEndEvent);
+
+
+                list.el.off('click');
+                list.el.unbind('destroy-nestable');
+
+                list.el.data("nestable", null);
+            };
+
+            list.el.bind('destroy-nestable', destroyNestable);
+
         },
 
         serialize: function()
@@ -455,6 +478,10 @@
                     this.hasNewRoot = this.el[0] !== this.dragRootEl[0];
                 }
             }
+        },
+
+        destroy: function() {
+            this.el.trigger('destroy-nestable');
         }
 
     };
